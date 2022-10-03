@@ -7,5 +7,5 @@ def user(django_user_model):
         username='Test user',
         password='1234567',
         first_name='test first name',
-        last_name='test last name'
+        last_name='test last name',
     )

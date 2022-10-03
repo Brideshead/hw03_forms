@@ -1,10 +1,12 @@
 from django.contrib import admin
-from .models import Post, Group
+
+from .models import Group, Post
 
 
+@admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     """
-    Настройки отображения модели в интерфейсе админки.
+    Настройки отображения модели 'Статьи' в интерфейсе админки.
 
     list_display: перечисляем поля, которые должны отображаться.
     list_editable: опция для измнения поля group в любом посте.
@@ -21,5 +23,21 @@ class PostAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
-admin.site.register(Post, PostAdmin)
-admin.site.register(Group)
+@admin.register(Group)
+class GroupAdmin(admin.ModelAdmin):
+    """
+    Настройки отображения модели 'Группы' в интерфейсе админки.
+
+    list_display: перечисляем поля, которые должны отображаться.
+    list_editable: опция для измнения поля заголовка в любом посте.
+    search_fields: интерфейс для поиска группы по уникальному номеру.
+    list_filter: фильтрация по заголовку.
+    empty_value_display: вывод в поле текста '-пусто',
+    если информация отсутствует.
+    """
+
+    list_display = ('pk', 'title')
+    list_editable = ('title',)
+    search_fields = ('pk',)
+    list_filter = ('title',)
+    empty_value_display = '-пусто-'

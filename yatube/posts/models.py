@@ -1,5 +1,5 @@
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
 
 User = get_user_model()
 
@@ -8,17 +8,21 @@ class Group(models.Model):
     """
     Модель для хранения данных сообществ.
 
+    TITLE_LENGTH_RETURN: ограничение символов на вывод названия группы.
+
     title: название группы.
     slug: уникальный адрес группы, часть URL.
     description: текст, описывающий сообщество.
     """
 
+    TITLE_LENGTH_RETURN: int = 10
+
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
     description = models.TextField()
 
-    def __str__(cls) -> str:
-        return f'{cls.title}'
+    def __str__(self) -> str:
+        return self.title[: self.TITLE_LENGTH_RETURN]
 
 
 class Post(models.Model):
@@ -40,8 +44,19 @@ class Post(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='posts')
-    group = models.ForeignKey(
-        Group, blank=True, null=True,
-        on_delete=models.CASCADE,
+        related_name='posts',
     )
+    group = models.ForeignKey(
+        Group,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='posts_post_related',
+    )
+
+    def __str__(self):
+        # выводим текст поста
+        return self.text
+
+    class Meta:
+        ordering = ['pub_date']

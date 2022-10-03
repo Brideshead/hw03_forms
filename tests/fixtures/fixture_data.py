@@ -9,9 +9,15 @@ def post(user):
 
 @pytest.fixture
 def group():
-    return Group.objects.create(title='Тестовая группа 1', slug='test-link', description='Тестовое описание группы')
+    return Group.objects.create(
+        title='Тестовая группа 1',
+        slug='test-link',
+        description='Тестовое описание группы',
+    )
 
 
 @pytest.fixture
 def post_with_group(user, group):
-    return Post.objects.create(text='Тестовый пост 2', author=user, group=group)
+    return Post.objects.create(
+        text='Тестовый пост 2', author=user, group=group
+    )
