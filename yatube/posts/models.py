@@ -15,19 +15,22 @@ class Group(models.Model):
     description: текст, описывающий сообщество.
     """
 
-    TITLE_LENGTH_RETURN: int = 10
+    TITLE_LENGTH_RETURN: int = 30
 
-    title = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True)
-    description = models.TextField()
+    title = models.CharField(verbose_name='Название группы', max_length=200)
+    slug = models.SlugField(verbose_name='Уникальный адрес', unique=True)
+    description = models.TextField(verbose_name='Описание группы')
 
     def __str__(self) -> str:
-        return self.title[: self.TITLE_LENGTH_RETURN]
+        return self.title[:self.TITLE_LENGTH_RETURN]
 
 
 class Post(models.Model):
     """
     Модель для хранения статей.
+
+    TITLE_LENGTH_RETURN: ограничение символов на вывод текста статьи.
+
 
     text: текс статьи.
     pud_date: дата публикации статьи.
@@ -39,11 +42,16 @@ class Post(models.Model):
     новой записи можно было сослаться на данную модель.
     """
 
-    text = models.TextField()
-    pub_date = models.DateTimeField(auto_now_add=True)
+    TEXT_LENGTH_RETURN: int = 50
+
+    text = models.TextField(verbose_name='Текст поста')
+    pub_date = models.DateTimeField(
+        verbose_name='Дата публикации', auto_now_add=True,
+    )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
+        verbose_name='Автор',
         related_name='posts',
     )
     group = models.ForeignKey(
@@ -51,12 +59,12 @@ class Post(models.Model):
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
-        related_name='posts_post_related',
+        verbose_name='Группа',
+        related_name='posts',
     )
 
-    def __str__(self):
-        # выводим текст поста
-        return self.text
-
     class Meta:
-        ordering = ['pub_date']
+        ordering = ('-pub_date',)
+
+    def __str__(self) -> str:
+        return self.text[:self.TEXT_LENGTH_RETURN]

@@ -1,8 +1,8 @@
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render
+
 from posts.models import Group, Post
 
-# Константа устанавливающая количество постов на странице.
 LIMIT_POSTS = 10
 
 
@@ -23,10 +23,7 @@ def group_posts(request: HttpRequest, slug: str) -> HttpResponse:
     и возвращает подготовленную html страницу с данными.
     """
     group = get_object_or_404(Group, slug=slug)
-    posts = group.posts_post_related.all()[:LIMIT_POSTS]
-
-    context = {
-        'group': group,
-        'posts': posts,
-    }
-    return render(request, 'posts/group_list.html', context)
+    posts = group.posts.all()[:LIMIT_POSTS]
+    return render(
+        request, 'posts/group_list.html', {'group': group, 'posts': posts},
+    )
