@@ -1,16 +1,17 @@
 {% extends "base.html" %}
-{% block title %}{{ title }}{% endblock title %}
+{% block title %} Последние обновления на сайте {% endblock title %}
+
 {% block content %}
-<div class="container py-5">
-  <h1> Последние обновления на сайте </h1>
-  {% for post in posts %}
-    {% include "posts/includes/post_card.html" %}
-  {% if post.group %}
-  <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы</a>
-  {% endif %}
-  {% if not forloop.last %}
-  <hr>
-  {% endif %}
-  {% endfor %}
-</div>
+  <div class="container py-5">
+    <h1>Последние обновления на сайте</h1>
+    {% for post in posts %}
+      {% include "posts/includes/post_card.html" %}
+    {% if post.group %}
+      <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы</a>
+    {% endif %}
+    {% if not forloop.last %}
+      <hr>
+    {% endif %}
+    {% endfor %}
+  </div>
 {% endblock %}

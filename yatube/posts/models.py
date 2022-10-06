@@ -52,7 +52,6 @@ class Post(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name='Автор',
-        related_name='posts',
     )
     group = models.ForeignKey(
         Group,
@@ -60,11 +59,11 @@ class Post(models.Model):
         null=True,
         on_delete=models.SET_NULL,
         verbose_name='Группа',
-        related_name='posts',
     )
 
     class Meta:
         ordering = ('-pub_date',)
+        default_related_name = 'posts'
 
     def __str__(self) -> str:
         return self.text[:self.TEXT_LENGTH_RETURN]

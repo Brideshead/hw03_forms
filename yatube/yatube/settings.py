@@ -9,13 +9,14 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
-    'posts.apps.PostsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'posts.apps.PostsConfig',
 ]
 
 MIDDLEWARE = [
@@ -31,8 +32,6 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'yatube.urls'
 
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
-
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 TEMPLATES = [
     {
@@ -85,3 +84,5 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
