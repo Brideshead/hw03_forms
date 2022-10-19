@@ -21,7 +21,7 @@ class Group(models.Model):
     slug = models.SlugField(verbose_name='Уникальный адрес', unique=True)
     description = models.TextField(verbose_name='Описание группы')
 
-    def __str__(self) -> str:
+    def __str__(self: None) -> str:
         return self.title[:self.TITLE_LENGTH_RETURN]
 
 
@@ -65,5 +65,8 @@ class Post(models.Model):
         ordering = ('-pub_date',)
         default_related_name = 'posts'
 
-    def __str__(self) -> str:
+    def __str__(self: None) -> str:
+        """
+        Возвращает в консоль сокращенный текст поста.
+        """
         return self.text[:self.TEXT_LENGTH_RETURN]

@@ -103,6 +103,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+static/
 .env
 .venv
 env/
@@ -145,4 +146,4 @@ dmypy.json
 .history/
 
 .mypy_cache
-/c/dev/hw02_community/yatube/static/
+/c/dev/test/hw03_community/yatube/static/
