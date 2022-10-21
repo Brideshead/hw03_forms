@@ -8,3 +8,4 @@ class CoreConfig(AppConfig):
     """
 
     name = 'core'
+    verbose_name = 'ядро'

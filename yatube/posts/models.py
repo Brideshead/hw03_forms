@@ -17,11 +17,11 @@ class Group(models.Model):
 
     TITLE_LENGTH_RETURN: int = 30
 
-    title = models.CharField(verbose_name='Название группы', max_length=200)
-    slug = models.SlugField(verbose_name='Уникальный адрес', unique=True)
-    description = models.TextField(verbose_name='Описание группы')
+    title = models.CharField('название группы', max_length=200)
+    slug = models.SlugField('уникальный адрес', unique=True)
+    description = models.TextField('описание группы')
 
-    def __str__(self: None) -> str:
+    def __str__(self) -> str:
         return self.title[:self.TITLE_LENGTH_RETURN]
 
 
@@ -44,7 +44,7 @@ class Post(models.Model):
 
     TEXT_LENGTH_RETURN: int = 50
 
-    text = models.TextField(verbose_name='Текст поста')
+    text = models.TextField('текст поста')
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации', auto_now_add=True,
     )
@@ -65,7 +65,7 @@ class Post(models.Model):
         ordering = ('-pub_date',)
         default_related_name = 'posts'
 
-    def __str__(self: None) -> str:
+    def __str__(self) -> str:
         """
         Возвращает в консоль сокращенный текст поста.
         """

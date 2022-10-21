@@ -1,10 +1,10 @@
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import get_object_or_404, render, redirect
-from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 
-from posts.models import Group, Post, User
+from core.utils import paginate
 from posts.forms import PostForm
+from posts.models import Group, Post, User
 
 LIMIT_POSTS = 10
 
@@ -15,14 +15,13 @@ def index(request: HttpRequest) -> HttpResponse:
     Принимает WSGIRequest и возвращает подготовленную
     html страницу с данными.
     """
-    posts = Post.objects.all()
-    paginator = Paginator(posts, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = paginate(Post.objects.select_related('group'), request)
     return render(
         request,
         'posts/index.html',
-        {'page_obj': page_obj},
+        {
+            'page_obj':page_obj,
+        },
     )
 
 
@@ -33,14 +32,13 @@ def group_posts(request: HttpRequest, slug: str) -> HttpResponse:
     и возвращает подготовленную html страницу с данными.
     """
     group = get_object_or_404(Group, slug=slug)
-    posts = group.posts.all()
-    paginator = Paginator(posts, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = paginate(group.posts.all(), request)
     return render(
         request,
         'posts/group_list.html',
-        {'group': group, 'page_obj': page_obj},
+        {
+            'group': group, 'page_obj': page_obj,
+        },
     )
 
 
@@ -49,19 +47,19 @@ def profile(request: HttpRequest, username: str) -> HttpResponse:
     Отрисовка страницы профиля пользователя с информацией
     обо всех постах данного пользователя.
     """
-    requested_user = User.objects.get(username=username)
-    post_list = Post.objects.filter(author=requested_user).all()
-    number_of_posts = Post.objects.filter(author=requested_user).count()
-    paginator = Paginator(post_list, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    requested_user = get_object_or_404(User, username=username)
+    page_obj = paginate(
+        Post.objects.select_related('author').filter(
+            author=requested_user,
+        ),
+        request,
+    )
     return render(
         request,
         'posts/profile.html',
         {
             'page_obj': page_obj,
             'profile_user': requested_user,
-            'count_posts_profile': number_of_posts,
         },
     )
 
@@ -70,14 +68,12 @@ def post_detail(request: HttpRequest, post_id: int) -> HttpResponse:
     """
     Отрисовка страницы с описанием конкретного выбранного поста.
     """
-    unique_post = Post.objects.get(pk=post_id)
-    number_of_posts = Post.objects.filter(author=unique_post.author).count()
+    unique_post = get_object_or_404(Post, pk=post_id)
     return render(
         request,
         'posts/post_detail.html',
         {
             'unique_post': unique_post,
-            'number_of_posts': number_of_posts,
         },
     )
 
@@ -90,21 +86,20 @@ def post_create(request: HttpRequest) -> HttpResponse:
     к которой данный пост будет относиться.
     Посты могут создавать только авторизованные пользователи.
     """
-    if request.method == 'POST':
-        form = PostForm(request.POST)
-        if form.is_valid():
-            author = User.objects.get(pk=request.user.id)
-            post = Post(
-                text=form.cleaned_data['text'],
-                author=author,
-                group=form.cleaned_data['group'])
-            post.save()
-            return redirect('posts:profile', author.username)
+    form = PostForm(request.POST or None)
+    if request.method != 'POST':
+        return render(
+            request, 
+            'posts/create_post.html', 
+            {
+                'form': form, 'is_edit': False
+            },
+        )
     else:
-        form = PostForm()
-    return render(
-        request, 'posts/create_post.html', {'form': form, 'is_edit': False},
-    )
+        post = form.save(commit=False)
+        post.author = request.user
+        post.save()
+        return redirect('posts:profile', post.author)
 
 
 @login_required
@@ -114,13 +109,15 @@ def post_edit(request: HttpRequest, post_id: int) -> HttpResponse:
     Пост может редактировать только авторизованный пользователь.
     Редактировать можно только свои посты.
     """
-    unique_post = get_object_or_404(Post, pk=post_id)
-    if unique_post.author != request.user:
+    post = get_object_or_404(Post, pk=post_id)
+    if post.author != request.user:
         return redirect('posts:post_detail', post_id)
-    form = PostForm(request.POST or None, instance=unique_post)
+
+    form = PostForm(request.POST or None, instance=post)
     if form.is_valid():
         form.save()
         return redirect('posts:post_detail', post_id)
+
     return render(
         request, 'posts/create_post.html', {'form': form, 'is_edit': True},
     )

@@ -9,3 +9,4 @@ class AboutConfig(AppConfig):
     """
 
     name = 'about'
+    verbose_name = 'об'
