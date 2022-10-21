@@ -1,7 +1,8 @@
 from django.contrib import admin
 
-from posts.models import Group, Post
 from core.admin import BaseAdmin
+from posts.models import Group, Post
+
 
 @admin.register(Post)
 class PostAdmin(BaseAdmin):

@@ -13,7 +13,7 @@ class CreationForm(UserCreationForm):
         fields = ('first_name', 'last_name', 'username', 'email')
         help_texts = {
             'first_name': 'имя пользователя',
-            'last_name' : 'фамилия пользователя',
+            'last_name': 'фамилия пользователя',
             'username': 'имя пользователя',
             'email': 'почта пользователя',
-        } 
+        }
