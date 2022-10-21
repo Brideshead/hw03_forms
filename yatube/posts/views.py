@@ -20,7 +20,7 @@ def index(request: HttpRequest) -> HttpResponse:
         request,
         'posts/index.html',
         {
-            'page_obj':page_obj,
+            'page_obj': page_obj,
         },
     )
 
@@ -87,19 +87,19 @@ def post_create(request: HttpRequest) -> HttpResponse:
     Посты могут создавать только авторизованные пользователи.
     """
     form = PostForm(request.POST or None)
-    if request.method != 'POST':
-        return render(
-            request, 
-            'posts/create_post.html', 
-            {
-                'form': form, 'is_edit': False
-            },
-        )
-    else:
+    if form.is_valid():
         post = form.save(commit=False)
         post.author = request.user
         post.save()
         return redirect('posts:profile', post.author)
+
+    return render(
+        request,
+        'posts/create_post.html',
+        {
+            'form': form, 'is_edit': False,
+        },
+    )
 
 
 @login_required
