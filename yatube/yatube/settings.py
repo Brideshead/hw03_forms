@@ -1,5 +1,7 @@
 import os
 
+LIMIT_POSTS = 10
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = '@2oi_1*!!ldqi+%dsrjk7n+=!v$e)^pncz#b2a&#ee(0vkp46n'

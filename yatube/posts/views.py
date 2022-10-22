@@ -5,8 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from core.utils import paginate
 from posts.forms import PostForm
 from posts.models import Group, Post, User
-
-LIMIT_POSTS = 10
+from yatube.settings import LIMIT_POSTS
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -15,7 +14,11 @@ def index(request: HttpRequest) -> HttpResponse:
     Принимает WSGIRequest и возвращает подготовленную
     html страницу с данными.
     """
-    page_obj = paginate(Post.objects.select_related('group'), request)
+    page_obj = paginate(
+        Post.objects.select_related('author', 'group'),
+        request,
+        LIMIT_POSTS,
+    )
     return render(
         request,
         'posts/index.html',
@@ -32,7 +35,11 @@ def group_posts(request: HttpRequest, slug: str) -> HttpResponse:
     и возвращает подготовленную html страницу с данными.
     """
     group = get_object_or_404(Group, slug=slug)
-    page_obj = paginate(group.posts.all(), request)
+    page_obj = paginate(
+        group.posts.select_related('group'),
+        request,
+        LIMIT_POSTS,
+    )
     return render(
         request,
         'posts/group_list.html',
@@ -47,19 +54,18 @@ def profile(request: HttpRequest, username: str) -> HttpResponse:
     Отрисовка страницы профиля пользователя с информацией
     обо всех постах данного пользователя.
     """
-    requested_user = get_object_or_404(User, username=username)
+    author = get_object_or_404(User, username=username)
     page_obj = paginate(
-        Post.objects.select_related('author').filter(
-            author=requested_user,
-        ),
+        author.posts.select_related('author'),
         request,
+        LIMIT_POSTS,
     )
     return render(
         request,
         'posts/profile.html',
         {
             'page_obj': page_obj,
-            'profile_user': requested_user,
+            'author': author,
         },
     )
 
@@ -68,12 +74,12 @@ def post_detail(request: HttpRequest, post_id: int) -> HttpResponse:
     """
     Отрисовка страницы с описанием конкретного выбранного поста.
     """
-    unique_post = get_object_or_404(Post, pk=post_id)
+    post = get_object_or_404(Post, pk=post_id)
     return render(
         request,
         'posts/post_detail.html',
         {
-            'unique_post': unique_post,
+            'post': post,
         },
     )
 
@@ -87,19 +93,19 @@ def post_create(request: HttpRequest) -> HttpResponse:
     Посты могут создавать только авторизованные пользователи.
     """
     form = PostForm(request.POST or None)
-    if form.is_valid():
+    if request.method != 'POST' or form.is_valid() == False:
+        return render(
+            request,
+            'posts/create_post.html',
+            {
+                'form': form, 'is_edit': False,
+            },
+        )
+    if form.is_valid() and request.method == 'POST':
         post = form.save(commit=False)
         post.author = request.user
         post.save()
         return redirect('posts:profile', post.author)
-
-    return render(
-        request,
-        'posts/create_post.html',
-        {
-            'form': form, 'is_edit': False,
-        },
-    )
 
 
 @login_required

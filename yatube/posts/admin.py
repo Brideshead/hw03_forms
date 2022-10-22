@@ -39,4 +39,3 @@ class GroupAdmin(admin.ModelAdmin):
     list_editable = ('title',)
     search_fields = ('pk',)
     list_filter = ('title',)
-    empty_value_display = '-пусто-'

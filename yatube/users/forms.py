@@ -8,12 +8,16 @@ class CreationForm(UserCreationForm):
     """
     Класс для формы регистрации.
     """
+    
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'username', 'email')
+        labels = {
+            'username': 'псевдоним',
+        }
         help_texts = {
-            'first_name': 'имя пользователя',
-            'last_name': 'фамилия пользователя',
-            'username': 'имя пользователя',
-            'email': 'почта пользователя',
+            'first_name': 'имя',
+            'last_name': 'фамилия',
+            'username': 'имя',
+            'email': 'почта',
         }
