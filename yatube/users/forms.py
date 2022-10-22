@@ -8,7 +8,7 @@ class CreationForm(UserCreationForm):
     """
     Класс для формы регистрации.
     """
-    
+
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'username', 'email')

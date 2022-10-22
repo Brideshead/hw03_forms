@@ -93,7 +93,7 @@ def post_create(request: HttpRequest) -> HttpResponse:
     Посты могут создавать только авторизованные пользователи.
     """
     form = PostForm(request.POST or None)
-    if request.method != 'POST' or form.is_valid() == False:
+    if request.method != 'POST' or form.is_valid() is False:
         return render(
             request,
             'posts/create_post.html',
